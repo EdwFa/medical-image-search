@@ -13,18 +13,18 @@ sequenceDiagram
     autonumber
     actor User as Пользователь
     participant UI as Streamlit App
-    participant CDN as ImgBB API (CDN)
+    participant CDN as ImgBB API
     participant Search as Поисковые системы
 
-    User->>UI: Загружает картинку (PNG/JPG)
+    User->>UI: Загружает картинку
     UI->>UI: Чтение байтов картинки
-    UI->>CDN: POST запрос с байтами + API Key
+    UI->>CDN: POST запрос с байтами
     Note over CDN: Изображение становится доступным публично
-    CDN-->>UI: Возвращает глобальный URL (например, i.ibb.co/img.png)
+    CDN-->>UI: Возвращает глобальный URL
     UI->>UI: Генерация URL-запросов
     UI-->>User: Отображение 6 кнопок поиска
-    User->>Search: Клик (Открывает вкладку с URL)
-    Search->>CDN: Бот поисковика скачивает картинку
+    User->>Search: Открывает вкладку с URL
+    Search->>CDN: Бот скачивает картинку
     Search-->>User: Отображение результатов плагиата
 ```
 
@@ -38,13 +38,13 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[Глобальный URL картинки] --> B(Google Lens)
-    A --> C(Bing Visual Search)
-    A --> D(TinEye)
+    A["Глобальный URL картинки"] --> B("Google Lens")
+    A --> C("Bing Visual Search")
+    A --> D("TinEye")
     
-    B -.->|Параметр| B1[?url=...]
-    C -.->|Параметр| C1[?q=imgurl:...]
-    D -.->|Параметр| D1[?url=...]
+    B -.->|"Параметр"| B1["?url=..."]
+    C -.->|"Параметр"| C1["?q=imgurl:..."]
+    D -.->|"Параметр"| D1["?url=..."]
 ```
 
 * **Google Lens:** Использует эндпоинт `uploadbyurl`. Это самый современный движок Google. 
@@ -57,11 +57,11 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A[Глобальный URL картинки] --> B(Baidu / 百度)
-    A --> C(Sogou / 搜狗)
+    A["Глобальный URL картинки"] --> B("Baidu / 百度")
+    A --> C("Sogou / 搜狗")
     
-    B -.->|Параметр| B1[?image=...]
-    C -.->|Параметр| C1[?query=...]
+    B -.->|"Параметр"| B1["?image=..."]
+    C -.->|"Параметр"| C1["?query=..."]
 ```
 
 * **Baidu:** Используется их скрытый графовый API `graph.baidu.com/details`.
@@ -75,15 +75,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Start([Пользователь нажимает: Yandex PubMed])
-    URL[Берем URL картинки] --> Format[Формируем гибридный запрос]
-    Format --> Param1[Параметр url=...]
-    Format --> Param2[Параметр text=site:ncbi.nlm.nih.gov]
-    Param1 --> Yandex[Сервер Yandex]
+    Start(["Пользователь нажимает: Yandex PubMed"])
+    URL["Берем URL картинки"] --> Format["Формируем гибридный запрос"]
+    Format --> Param1["Параметр url=..."]
+    Format --> Param2["Параметр text=site:ncbi.nlm.nih.gov"]
+    Param1 --> Yandex["Сервер Yandex"]
     Param2 --> Yandex
-    Yandex --> Filter{Фильтрация доменов}
-    Filter --> |Pinterest, Blogs, News| Drop[Игнорировать]
-    Filter --> |pubmed.ncbi, pmc| Show([Показать научную статью])
+    Yandex --> Filter{"Фильтрация доменов"}
+    Filter --> |"Pinterest, Blogs, News"| Drop["Игнорировать"]
+    Filter --> |"pubmed.ncbi, pmc"| Show(["Показать научную статью"])
 ```
 
 * **Суть метода:** Мы заставляем Яндекс использовать свой мощный движок визуального поиска (`rpt=imageview`), но при этом принудительно добавляем текстовый фильтр (`text=site:ncbi.nlm.nih.gov`).
